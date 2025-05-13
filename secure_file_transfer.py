@@ -7,8 +7,25 @@ import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
-
 import mysql.connector
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #   <================================ SUYASH PART=================================>
 class AuthSystem:
     def __init__(self):
@@ -45,6 +62,17 @@ class AuthSystem:
 # <================================ SUYASH PART ENDS======================================>
 
 
+
+
+
+
+
+
+
+
+
+
+
 # <====================================BARMOLA PART=========================================>
 class CryptoManager:
     def __init__(self):
@@ -74,6 +102,26 @@ class CryptoManager:
         return unpadder.update(padded_data) + unpadder.finalize()
 # <==========================BARMOLA PART ENDS=====================================>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # <==================================SWASTIKA PART=================================>
 class FileTransfer:
     def __init__(self, crypto_manager):
@@ -87,24 +135,6 @@ class FileTransfer:
                 encrypted = self.crypto.encrypt(data)
                 s.sendall(len(encrypted).to_bytes(8, 'big') + encrypted)
 
-    def receive_file(self, host, port, save_path):
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.bind((host, port))
-            s.listen(1)
-            conn, addr = s.accept()
-            with conn:
-                size = int.from_bytes(conn.recv(8), 'big')
-                received = b''
-                while len(received) < size:
-                    chunk = conn.recv(4096)
-                    if not chunk:
-                        break
-                    received += chunk
-                decrypted = self.crypto.decrypt(received)
-                with open(save_path, 'wb') as f:
-                    f.write(decrypted)
-
-
 class FileIntegrity:
     @staticmethod
     def get_hash(file_path):
@@ -114,6 +144,19 @@ class FileIntegrity:
                 hasher.update(chunk)
         return hasher.hexdigest()
  # <======================================SWASTIKA PART ENDS==========================>
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #  <========================================GUI PART=============================>
 class SecureTransferApp(tk.Tk):
@@ -184,7 +227,6 @@ class SecureTransferApp(tk.Tk):
         self.port_entry.pack()
         
         ttk.Button(self, text="Send File", command=self.start_send).pack(pady=10)
-        ttk.Button(self, text="Receive Files", command=self.start_receive).pack()
         
         # Status
         self.progress = ttk.Progressbar(self, mode='determinate')
@@ -213,29 +255,6 @@ class SecureTransferApp(tk.Tk):
             self.status_label.config(text="Encrypting...")
             self.transfer.send_file(host, port, self.current_file)
             self.status_label.config(text="File sent successfully")
-        except Exception as e:
-            messagebox.showerror("Error", str(e))
-
-    def start_receive(self):
-        port = int(self.port_entry.get())
-        save_path = filedialog.asksaveasfilename()
-        
-        if save_path:
-            threading.Thread(target=self.receive_file, args=(port, save_path)).start()
-
-    def receive_file(self, port, save_path):
-        try:
-            self.status_label.config(text="Waiting for connection...")
-            self.transfer.receive_file('', port, save_path)
-            
-            # Verify integrity
-            original_hash = FileIntegrity.get_hash(self.current_file)
-            received_hash = FileIntegrity.get_hash(save_path)
-            
-            if original_hash == received_hash:
-                self.status_label.config(text="File received successfully")
-            else:
-                messagebox.showerror("Error", "File integrity check failed")
         except Exception as e:
             messagebox.showerror("Error", str(e))
 
