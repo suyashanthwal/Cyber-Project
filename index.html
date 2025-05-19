@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure File Transfer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <h1>Secure File Transfer</h1>
+    </header>
+
+    <!-- Login Page -->
+    <div id="login-page" class="form-container">
+        <h2>Log In</h2>
+        <div id="login-form">
+            <label for="login-username">Username</label>
+            <input type="text" id="login-username" placeholder="Enter your username">
+            <label for="login-password">Password</label>
+            <input type="password" id="login-password" placeholder="Enter your password">
+            <button onclick="login()">Log In</button>
+        </div>
+        <p class="form-footer">
+            Don't have an account? <a href="#" onclick="toggleForms()">Sign up here</a>
+        </p>
+    </div>
+
+    <!-- Registration Page -->
+    <div id="register-page" class="form-container" style="display: none;">
+        <h2>Sign Up</h2>
+        <div id="register-form">
+            <label for="register-username">Username</label>
+            <input type="text" id="register-username" placeholder="Enter your username">
+            <label for="register-password">Password</label>
+            <input type="password" id="register-password" placeholder="Enter your password">
+            <button onclick="register()">Sign Up</button>
+        </div>
+        <p class="form-footer">
+            Already have an account? <a href="#" onclick="toggleForms()">Log in here</a>
+        </p>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" style="display: none;">
+        <h1>Welcome to Secure File Transfer</h1>
+        <button onclick="showSendFile()">Send File</button>
+        <button onclick="showReceiveFile()">Receive File</button>
+    </div>
+
+    <!-- Send File Page -->
+    <div id="send-file-page" style="display: none;">
+        <h2>Send File</h2>
+        <input type="file" id="file-input">
+        <button onclick="discoverDevices()">Discover Devices</button>
+        <ul id="devices-list"></ul>
+        <button onclick="uploadFile()">Send</button>
+        <button onclick="goToDashboard()">Back</button>
+    </div>
+
+    <!-- Receive File Page -->
+    <div id="receive-file-page" style="display: none;">
+        <h2>Receive File</h2>
+        <button onclick="startReceiving()">Start Listening</button>
+        <button onclick="goToDashboard()">Back</button>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 Secure File Transfer. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

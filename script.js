@@ -1,0 +1,117 @@
+function login() {
+    const username = document.getElementById('login-username').value;
+    const password = document.getElementById('login-password').value;
+
+    fetch('http://127.0.0.1:5000/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            document.getElementById('login-page').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function register() {
+    const username = document.getElementById('register-username').value;
+    const password = document.getElementById('register-password').value;
+
+    fetch('http://127.0.0.1:5000/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+    })
+    .then(response => response.json())
+    .then(data => alert(data.message))
+    .catch(error => console.error('Error:', error));
+}
+
+function showSendFile() {
+    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('send-file-page').style.display = 'block';
+}
+
+function showReceiveFile() {
+    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('receive-file-page').style.display = 'block';
+}
+
+function goToDashboard() {
+    document.getElementById('send-file-page').style.display = 'none';
+    document.getElementById('receive-file-page').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+}
+
+function uploadFile() {
+    const fileInput = document.getElementById('file-input');
+    const devicesList = document.getElementById('devices-list');
+
+    if (!fileInput.files.length) {
+        alert('Please select a file.');
+        return;
+    }
+
+    if (!devicesList.innerHTML.includes('Receiver found')) {
+        alert('Please discover and select a receiver.');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', fileInput.files[0]);
+
+    fetch('http://127.0.0.1:5000/upload', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => alert(data.message || 'File sent successfully!'))
+    .catch(error => console.error('Error:', error));
+}
+
+function startReceiving() {
+    alert('Listening for incoming files...');
+    // Backend logic will handle the actual file reception.
+}
+
+function toggleForms() {
+    const loginPage = document.getElementById('login-page');
+    const registerPage = document.getElementById('register-page');
+    if (loginPage.style.display === 'none') {
+        loginPage.style.display = 'block';
+        registerPage.style.display = 'none';
+    } else {
+        loginPage.style.display = 'none';
+        registerPage.style.display = 'block';
+    }
+}
+
+function discoverDevices() {
+    const discoveryPort = 5001;
+    const discoveryMessage = "DISCOVER_SECURE_TRANSFER";
+    const devicesList = document.getElementById('devices-list');
+
+    devicesList.innerHTML = "Searching for devices...";
+
+    // Send a discovery request to the local network
+    fetch(`http://127.0.0.1:${discoveryPort}/discover`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                devicesList.innerHTML = `<li>Receiver found: ${data.message}</li>`;
+            } else {
+                devicesList.innerHTML = "No devices found.";
+            }
+        })
+        .catch(error => {
+            console.error("Error discovering devices:", error);
+            devicesList.innerHTML = "Error discovering devices.";
+        });
+}
