@@ -1,8 +1,10 @@
+const backendUrl = 'http://192.168.1.5:5000'; // Replace with your local IP address
+
 function login() {
     const username = document.getElementById('login-username').value;
     const password = document.getElementById('login-password').value;
 
-    fetch('http://127.0.0.1:5000/login', {
+    fetch(`${backendUrl}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
@@ -24,7 +26,7 @@ function register() {
     const username = document.getElementById('register-username').value;
     const password = document.getElementById('register-password').value;
 
-    fetch('http://127.0.0.1:5000/register', {
+    fetch(`${backendUrl}/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
@@ -67,7 +69,7 @@ function uploadFile() {
     const formData = new FormData();
     formData.append('file', fileInput.files[0]);
 
-    fetch('http://127.0.0.1:5000/upload', {
+    fetch(`${backendUrl}/upload`, {
         method: 'POST',
         body: formData
     })
@@ -101,7 +103,7 @@ function discoverDevices() {
     devicesList.innerHTML = "Searching for devices...";
 
     // Send a discovery request to the local network
-    fetch(`http://127.0.0.1:${discoveryPort}/discover`)
+    fetch(`http://192.168.1.5:${discoveryPort}/discover`)
         .then(response => response.json())
         .then(data => {
             if (data.success) {
