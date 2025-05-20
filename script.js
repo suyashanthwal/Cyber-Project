@@ -55,28 +55,38 @@ function goToDashboard() {
 function uploadFile() {
     const fileInput = document.getElementById('file-input');
     const devicesList = document.getElementById('devices-list');
-
+    
     if (!fileInput.files.length) {
         alert('Please select a file.');
         return;
     }
-
+    
     if (!devicesList.innerHTML.includes('Receiver found')) {
         alert('Please discover and select a receiver.');
         return;
     }
-
+    
     const formData = new FormData();
     formData.append('file', fileInput.files[0]);
-
+    
     fetch(`${backendUrl}/upload`, {
         method: 'POST',
         body: formData
     })
     .then(response => response.json())
-    .then(data => alert(data.message || 'File sent successfully!'))
-    .catch(error => console.error('Error:', error));
+    .then(data => {
+        if (data.success) {
+            alert('File uploaded successfully! Encrypted as: ' + data.encrypted_file);
+        } else {
+            alert('Upload failed: ' + (data.message || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Upload failed. See console for details.');
+    });
 }
+
 
 function startReceiving() {
     alert('Listening for incoming files...');
@@ -96,7 +106,7 @@ function toggleForms() {
 }
 
 function discoverDevices() {
-    const discoveryPort = 5001;
+    const discoveryPort = 5000;
     const discoveryMessage = "DISCOVER_SECURE_TRANSFER";
     const devicesList = document.getElementById('devices-list');
 
@@ -116,4 +126,14 @@ function discoverDevices() {
             console.error("Error discovering devices:", error);
             devicesList.innerHTML = "Error discovering devices.";
         });
+}
+
+function downloadFile() {
+    const filename = document.getElementById('download-filename').value.trim();
+    if (!filename) {
+        alert('Please enter the encrypted filename.');
+        return;
+    }
+    // This will trigger the download and decryption from the server
+    window.open(`${backendUrl}/download/${filename}`, '_blank');
 }

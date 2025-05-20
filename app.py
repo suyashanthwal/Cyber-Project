@@ -131,6 +131,8 @@ def upload_file():
         f.write(encrypted_data)
     return jsonify({"success": True, "encrypted_file": f"encrypted_{filename}"})
 
+
+
 @app.route('/download/<filename>', methods=['GET'])
 def download_file(filename):
     encrypted_path = os.path.join(UPLOAD_FOLDER, filename)

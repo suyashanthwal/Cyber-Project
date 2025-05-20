@@ -52,19 +52,26 @@
     <!-- Send File Page -->
     <div id="send-file-page" style="display: none;">
         <h2>Send File</h2>
-        <input type="file" id="file-input">
-        <button onclick="discoverDevices()">Discover Devices</button>
-        <ul id="devices-list"></ul>
-        <button onclick="uploadFile()">Send</button>
+        <div>
+            <input type="file" id="file-input" />
+            <button onclick="discoverDevices()">Discover Devices</button>
+            <ul id="devices-list"></ul>
+            <button onclick="uploadFile()">Send</button>
+        </div>
         <button onclick="goToDashboard()">Back</button>
     </div>
+    
 
     <!-- Receive File Page -->
     <div id="receive-file-page" style="display: none;">
         <h2>Receive File</h2>
-        <button onclick="startReceiving()">Start Listening</button>
+        <div>
+            <input type="text" id="download-filename" placeholder="Enter encrypted filename (e.g., encrypted_first.txt)" />
+            <button onclick="downloadFile()">Download & Decrypt</button>
+        </div>
         <button onclick="goToDashboard()">Back</button>
     </div>
+    
 
     <!-- Footer -->
     <footer>
