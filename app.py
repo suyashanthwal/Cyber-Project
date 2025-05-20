@@ -4,6 +4,7 @@ from werkzeug.utils import secure_filename
 import os
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import padding
 import mysql.connector
 import hashlib
 import datetime
@@ -33,10 +34,12 @@ AES_KEY = b'0123456789abcdef'
 def encrypt_file(file_path):
     with open(file_path, 'rb') as f:
         data = f.read()
+    padder = padding.PKCS7(128).padder()  # 128 bits = 16 bytes
+    padded_data = padder.update(data) + padder.finalize()
     iv = os.urandom(16)
     cipher = Cipher(algorithms.AES(AES_KEY), modes.CBC(iv), backend=default_backend())
     encryptor = cipher.encryptor()
-    encrypted_data = encryptor.update(data) + encryptor.finalize()
+    encrypted_data = encryptor.update(padded_data) + encryptor.finalize()
     return iv + encrypted_data
 
 def decrypt_file(file_path):
@@ -46,7 +49,12 @@ def decrypt_file(file_path):
     encrypted_data = data[16:]
     cipher = Cipher(algorithms.AES(AES_KEY), modes.CBC(iv), backend=default_backend())
     decryptor = cipher.decryptor()
-    return decryptor.update(encrypted_data) + decryptor.finalize()
+    padded_plaintext = decryptor.update(encrypted_data) + decryptor.finalize()
+    # Unpad after decryption
+    unpadder = padding.PKCS7(128).unpadder()
+    plaintext = unpadder.update(padded_plaintext) + unpadder.finalize()
+    return plaintext
+
 
 # Discovery settings
 DISCOVERY_PORT = 5001
@@ -124,12 +132,18 @@ def upload_file():
     file = request.files['file']
     filename = secure_filename(file.filename)
     file_path = os.path.join(UPLOAD_FOLDER, filename)
+    file.seek(0)  # Reset pointer before saving
     file.save(file_path)
-    encrypted_data = encrypt_file(file_path)
-    encrypted_path = os.path.join(UPLOAD_FOLDER, f"encrypted_{filename}")
-    with open(encrypted_path, 'wb') as f:
-        f.write(encrypted_data)
-    return jsonify({"success": True, "encrypted_file": f"encrypted_{filename}"})
+    try:
+        encrypted_data = encrypt_file(file_path)
+        encrypted_path = os.path.join(UPLOAD_FOLDER, f"encrypted_{filename}")
+        with open(encrypted_path, 'wb') as f:
+            f.write(encrypted_data)
+        return jsonify({"success": True, "encrypted_file": f"encrypted_{filename}"})
+    except Exception as e:
+        print(f"Encryption error: {e}")
+        return jsonify({"success": False, "message": "Encryption failed"}), 500
+
 
 
 
