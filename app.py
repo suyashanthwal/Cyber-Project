@@ -1,12 +1,12 @@
 from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS  # Import CORS
-from werkzeug.utils import secure_filename
+#from werkzeug.utils import secure_filename
 import os
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import padding
 import mysql.connector
-import hashlib
+#import hashlib
 import datetime
 import socket
 import threading
@@ -130,9 +130,9 @@ def upload_file():
     if 'file' not in request.files:
         return jsonify({"success": False, "message": "No file uploaded"}), 400
     file = request.files['file']
-    filename = secure_filename(file.filename)
+    filename = file.filename
     file_path = os.path.join(UPLOAD_FOLDER, filename)
-    file.seek(0)  # Reset pointer before saving
+    file.seek(0) 
     file.save(file_path)
     try:
         encrypted_data = encrypt_file(file_path)

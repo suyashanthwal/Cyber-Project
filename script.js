@@ -90,7 +90,6 @@ function uploadFile() {
 
 function startReceiving() {
     alert('Listening for incoming files...');
-    // Backend logic will handle the actual file reception.
 }
 
 function toggleForms() {
@@ -112,7 +111,6 @@ function discoverDevices() {
 
     devicesList.innerHTML = "Searching for devices...";
 
-    // Send a discovery request to the local network
     fetch(`http://192.168.1.5:${discoveryPort}/discover`)
         .then(response => response.json())
         .then(data => {
@@ -134,6 +132,5 @@ function downloadFile() {
         alert('Please enter the encrypted filename.');
         return;
     }
-    // This will trigger the download and decryption from the server
     window.open(`${backendUrl}/download/${filename}`, '_blank');
 }
