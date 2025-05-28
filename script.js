@@ -1,6 +1,78 @@
-const backendUrl = 'http://172.20.10.2:5000'; // Replace with the correct IP addressss
+let backendUrl = '';
+
+// Function to discover the server
+async function discoverServer() {
+    // Try common local network IP patterns
+    const commonPorts = [5000];
+    const commonIPs = [
+        '127.0.0.1',  // localhost
+        ...Array.from({length: 255}, (_, i) => `192.168.1.${i}`),
+        ...Array.from({length: 255}, (_, i) => `192.168.0.${i}`),
+        ...Array.from({length: 255}, (_, i) => `172.20.10.${i}`)
+    ];
+
+    for (const ip of commonIPs) {
+        for (const port of commonPorts) {
+            try {
+                const response = await fetch(`http://${ip}:${port}/get-server-info`, {
+                    timeout: 100  // Short timeout to keep the search fast
+                });
+                const data = await response.json();
+                if (data.success) {
+                    backendUrl = `http://${data.ip}:${data.port}`;
+                    console.log('Server found at:', backendUrl);
+                    return true;
+                }
+            } catch (e) {
+                // Ignore errors and continue searching
+            }
+        }
+    }
+    return false;
+}
+
+// Initialize server discovery when the page loads
+window.addEventListener('load', async () => {
+    const statusElement = document.createElement('div');
+    statusElement.style.position = 'fixed';
+    statusElement.style.top = '10px';
+    statusElement.style.right = '10px';
+    statusElement.style.padding = '10px';
+    statusElement.style.backgroundColor = 'rgba(0,0,0,0.7)';
+    statusElement.style.color = 'white';
+    statusElement.style.borderRadius = '5px';
+    document.body.appendChild(statusElement);
+
+    statusElement.textContent = 'Searching for server...';
+    const found = await discoverServer();
+    
+    if (found) {
+        statusElement.textContent = 'Connected to server';
+        setTimeout(() => statusElement.remove(), 3000);
+    } else {
+        statusElement.textContent = 'Could not find server';
+        statusElement.style.backgroundColor = 'rgba(255,0,0,0.7)';
+    }
+});
+
+// Add retry connection button to the login page
+document.addEventListener('DOMContentLoaded', () => {
+    const loginForm = document.getElementById('login-form');
+    const retryButton = document.createElement('button');
+    retryButton.textContent = 'Retry Connection';
+    retryButton.onclick = async (e) => {
+        e.preventDefault();
+        const found = await discoverServer();
+        alert(found ? 'Connected to server!' : 'Could not find server');
+    };
+    loginForm.appendChild(retryButton);
+});
 
 function login() {
+    if (!backendUrl) {
+        alert('Not connected to server. Please retry connection.');
+        return;
+    }
     const username = document.getElementById('login-username').value;
     const password = document.getElementById('login-password').value;
 
@@ -44,6 +116,47 @@ function showSendFile() {
 function showReceiveFile() {
     document.getElementById('dashboard').style.display = 'none';
     document.getElementById('receive-file-page').style.display = 'block';
+    refreshFileList(); // Automatically load the file list when showing the receive page
+}
+
+function refreshFileList() {
+    const select = document.getElementById('available-files');
+    select.innerHTML = '<option value="">Loading files...</option>';
+
+    fetch(`${backendUrl}/list-files`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                select.innerHTML = '<option value="">Select a file to download</option>';
+                data.files.forEach(file => {
+                    const option = document.createElement('option');
+                    option.value = file;
+                    option.textContent = file.replace('encrypted_', ''); // Show original filename
+                    select.appendChild(option);
+                });
+                if (data.files.length === 0) {
+                    select.innerHTML = '<option value="">No files available</option>';
+                }
+            } else {
+                select.innerHTML = '<option value="">Error loading files</option>';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            select.innerHTML = '<option value="">Error loading files</option>';
+        });
+}
+
+function downloadSelectedFile() {
+    const select = document.getElementById('available-files');
+    const filename = select.value;
+    
+    if (!filename) {
+        alert('Please select a file to download.');
+        return;
+    }
+    
+    window.open(`${backendUrl}/download/${filename}`, '_blank');
 }
 
 function goToDashboard() {
@@ -105,13 +218,15 @@ function toggleForms() {
 }
 
 function discoverDevices() {
-    const discoveryPort = 5000;
-    const discoveryMessage = "DISCOVER_SECURE_TRANSFER";
     const devicesList = document.getElementById('devices-list');
-
     devicesList.innerHTML = "Searching for devices...";
 
-    fetch(`http://172.20.10.2:5000/discover`)
+    if (!backendUrl) {
+        devicesList.innerHTML = "Not connected to server. Please refresh the page or use the Retry Connection button.";
+        return;
+    }
+
+    fetch(`${backendUrl}/discover`)
         .then(response => response.json())
         .then(data => {
             if (data.success) {
@@ -122,15 +237,6 @@ function discoverDevices() {
         })
         .catch(error => {
             console.error("Error discovering devices:", error);
-            devicesList.innerHTML = "Error discovering devices.";
+            devicesList.innerHTML = "Error discovering devices. Please check if the server is running.";
         });
-}
-
-function downloadFile() {
-    const filename = document.getElementById('download-filename').value.trim();
-    if (!filename) {
-        alert('Please enter the encrypted filename.');
-        return;
-    }
-    window.open(`${backendUrl}/download/${filename}`, '_blank');
 }

@@ -136,8 +136,13 @@ def upload_file():
         print(f"Encryption error: {e}")
         return jsonify({"success": False, "message": "Encryption failed"}), 500
 
-
-
+@app.route('/list-files', methods=['GET'])
+def list_files():
+    try:
+        files = [f for f in os.listdir(UPLOAD_FOLDER) if f.startswith('encrypted_')]
+        return jsonify({"success": True, "files": files})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
 
 @app.route('/download/<filename>', methods=['GET'])
 def download_file(filename):
@@ -147,6 +152,26 @@ def download_file(filename):
     with open(decrypted_path, 'wb') as f:
         f.write(decrypted_data)
     return send_file(decrypted_path, as_attachment=True)
+
+def get_local_ip():
+    try:
+        # Create a socket to get the local IP
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        # Doesn't need to be reachable
+        s.connect(('8.8.8.8', 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except Exception:
+        return '127.0.0.1'  # Fallback to localhost
+
+@app.route('/get-server-info', methods=['GET'])
+def get_server_info():
+    return jsonify({
+        "success": True,
+        "ip": get_local_ip(),
+        "port": 5000  # Your server port
+    })
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

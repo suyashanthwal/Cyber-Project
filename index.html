@@ -66,8 +66,11 @@
     <div id="receive-file-page" style="display: none;">
         <h2>Receive File</h2>
         <div>
-            <input type="text" id="download-filename" placeholder="Enter encrypted filename (e.g., encrypted_first.txt)" />
-            <button onclick="downloadFile()">Download & Decrypt</button>
+            <select id="available-files" style="width: 100%; padding: 10px; margin-bottom: 15px;">
+                <option value="">Select a file to download</option>
+            </select>
+            <button onclick="refreshFileList()">Refresh File List</button>
+            <button onclick="downloadSelectedFile()">Download & Decrypt</button>
         </div>
         <button onclick="goToDashboard()">Back</button>
     </div>
