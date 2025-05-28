@@ -1,4 +1,4 @@
-const backendUrl = 'http://192.168.1.5:5000'; // Replace with your local IP address
+const backendUrl = 'http://172.20.10.2:5000'; // Replace with the correct IP addressss
 
 function login() {
     const username = document.getElementById('login-username').value;
@@ -111,7 +111,7 @@ function discoverDevices() {
 
     devicesList.innerHTML = "Searching for devices...";
 
-    fetch(`http://192.168.1.5:${discoveryPort}/discover`)
+    fetch(`http://172.20.10.2:5000/discover`)
         .then(response => response.json())
         .then(data => {
             if (data.success) {

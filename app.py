@@ -1,25 +1,23 @@
 from flask import Flask, request, jsonify, send_file
-from flask_cors import CORS  # Import CORS
-#from werkzeug.utils import secure_filename
+from flask_cors import CORS
 import os
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import padding
 import mysql.connector
-#import hashlib
 import datetime
 import socket
 import threading
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
+CORS(app)
 
 UPLOAD_FOLDER = 'uploads'
 DECRYPTED_FOLDER = 'decrypted'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(DECRYPTED_FOLDER, exist_ok=True)
 
-# Database connection
+
 db_config = {
     "host": "localhost",
     "user": "root",
@@ -27,14 +25,12 @@ db_config = {
     "database": "user_authentication_database"
 }
 
-# Encryption key
 AES_KEY = b'0123456789abcdef'
 
-# Helper functions
 def encrypt_file(file_path):
     with open(file_path, 'rb') as f:
         data = f.read()
-    padder = padding.PKCS7(128).padder()  # 128 bits = 16 bytes
+    padder = padding.PKCS7(128).padder()
     padded_data = padder.update(data) + padder.finalize()
     iv = os.urandom(16)
     cipher = Cipher(algorithms.AES(AES_KEY), modes.CBC(iv), backend=default_backend())
@@ -50,22 +46,20 @@ def decrypt_file(file_path):
     cipher = Cipher(algorithms.AES(AES_KEY), modes.CBC(iv), backend=default_backend())
     decryptor = cipher.decryptor()
     padded_plaintext = decryptor.update(encrypted_data) + decryptor.finalize()
-    # Unpad after decryption
     unpadder = padding.PKCS7(128).unpadder()
     plaintext = unpadder.update(padded_plaintext) + unpadder.finalize()
     return plaintext
 
 
-# Discovery settings
 DISCOVERY_PORT = 5001
 DISCOVERY_MESSAGE = "DISCOVER_SECURE_TRANSFER"
 
-# Respond to discovery requests
+
 @app.route('/discover', methods=['GET'])
 def discover():
     return jsonify({"success": True, "message": "Receiver is available"})
 
-# Start a UDP server for discovery
+
 def start_discovery_server():
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -77,10 +71,8 @@ def start_discovery_server():
             print(f"Discovery request received from {addr}")
             sock.sendto(b"RECEIVER_AVAILABLE", addr)
 
-# Start the discovery server in a separate thread
 threading.Thread(target=start_discovery_server, daemon=True).start()
 
-# Routes
 @app.route('/register', methods=['POST'])
 def register():
     try:
@@ -157,4 +149,4 @@ def download_file(filename):
     return send_file(decrypted_path, as_attachment=True)
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)  # Bind to all network interfaces
+    app.run(debug=True, host='0.0.0.0', port=5000)
