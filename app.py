@@ -8,7 +8,7 @@ import mysql.connector
 import datetime
 import socket
 import threading
-
+#<----------------------------------barmola------------------------------------>
 app = Flask(__name__)
 CORS(app)
 
@@ -72,7 +72,43 @@ def start_discovery_server():
             sock.sendto(b"RECEIVER_AVAILABLE", addr)
 
 threading.Thread(target=start_discovery_server, daemon=True).start()
+#<------------------------------barmola------------------------------------->
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#<---------------------------------suyash------------------------------------>
 @app.route('/register', methods=['POST'])
 def register():
     try:
@@ -116,7 +152,39 @@ def login():
     except mysql.connector.Error as err:
         print(f"Database error: {err}")
         return jsonify({"success": False, "message": "Database error"}), 500
+#<---------------------------------suyash------------------------------------>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#<---------------------------------barmola------------------------------------>
 @app.route('/upload', methods=['POST'])
 def upload_file():
     if 'file' not in request.files:
@@ -175,3 +243,5 @@ def get_server_info():
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
+
+#<---------------------------------barmola------------------------------------>

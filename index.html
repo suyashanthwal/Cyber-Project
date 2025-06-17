@@ -7,12 +7,10 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Header -->
     <header>
         <h1>Secure File Transfer</h1>
     </header>
 
-    <!-- Login Page -->
     <div id="login-page" class="form-container">
         <h2>Log In</h2>
         <div id="login-form">
@@ -27,7 +25,6 @@
         </p>
     </div>
 
-    <!-- Registration Page -->
     <div id="register-page" class="form-container" style="display: none;">
         <h2>Sign Up</h2>
         <div id="register-form">
@@ -42,14 +39,12 @@
         </p>
     </div>
 
-    <!-- Dashboard -->
     <div id="dashboard" style="display: none;">
         <h1>Welcome to Secure File Transfer</h1>
         <button onclick="showSendFile()">Send File</button>
         <button onclick="showReceiveFile()">Receive File</button>
     </div>
 
-    <!-- Send File Page -->
     <div id="send-file-page" style="display: none;">
         <h2>Send File</h2>
         <div>
@@ -61,8 +56,6 @@
         <button onclick="goToDashboard()">Back</button>
     </div>
     
-
-    <!-- Receive File Page -->
     <div id="receive-file-page" style="display: none;">
         <h2>Receive File</h2>
         <div>
@@ -75,8 +68,6 @@
         <button onclick="goToDashboard()">Back</button>
     </div>
     
-
-    <!-- Footer -->
     <footer>
         <p>&copy; 2025 Secure File Transfer. All rights reserved.</p>
     </footer>
