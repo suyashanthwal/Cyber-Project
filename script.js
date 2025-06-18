@@ -166,6 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('login-form');
     const retryButton = document.createElement('button');
     retryButton.textContent = 'Retry Connection';
+    retryButton.style.marginTop = '15px';
     retryButton.onclick = async (e) => {
         e.preventDefault();
         const found = await discoverServer();
@@ -175,11 +176,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function login() {
-    if (!backendUrl) {
-        alert('Not connected to server. Please retry connection.');
-        return;
-    }
-
     const username = document.getElementById('login-username').value;
     const password = document.getElementById('login-password').value;
 
