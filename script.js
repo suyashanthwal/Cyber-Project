@@ -1,4 +1,3 @@
-//<----------------------------swastika--------------------------->
 let backendUrl = '';
 
 async function discoverServer() {
@@ -99,46 +98,6 @@ async function discoverDevices() {
         devicesList.innerHTML = 'Error discovering devices. Please check if the server is running.';
     }
 }
-//<----------------------------swastika--------------------------->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//<----------------------------suyash--------------------------->
 window.addEventListener('load', async () => {
     const statusElement = document.createElement('div');
     statusElement.style.position = 'fixed';
@@ -277,4 +236,33 @@ function toggleForms() {
         registerPage.style.display = 'block';
     }
 }
-//<----------------------------suyash--------------------------->
+
+function setManualIP() {
+    const ipInput = document.getElementById('server-ip');
+    const ip = ipInput.value.trim();
+    
+    if (!ip) {
+        alert('Please enter a server IP address');
+        return;
+    }
+    fetch(`http://${ip}:5000/get-server-info`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                backendUrl = `http://${ip}:5000`;
+                alert('Successfully connected to server!');
+                const statusElement = document.querySelector('div[style*="position: fixed"]');
+                if (statusElement) {
+                    statusElement.textContent = 'Connected to server';
+                    statusElement.style.backgroundColor = 'rgba(0,255,0,0.7)';
+                    setTimeout(() => statusElement.remove(), 3000);
+                }
+            } else {
+                alert('Could not connect to server at this IP');
+            }
+        })
+        .catch(error => {
+            console.error('Connection error:', error);
+            alert('Could not connect to server at this IP. Please check the IP and try again.');
+        });
+}

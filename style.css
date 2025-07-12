@@ -121,7 +121,6 @@ footer {
     font-size: 14px;
 }
 
-/* Media query for smaller screens (phones) */
 @media (max-width: 600px) {
     body {
         padding: 10px;

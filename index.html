@@ -14,6 +14,10 @@
     <div id="login-page" class="form-container">
         <h2>Log In</h2>
         <div id="login-form">
+            <label for="server-ip">Server IP (if auto-discovery fails)</label>
+            <input type="text" id="server-ip" placeholder="Enter server IP (e.g., 192.168.1.100)">
+            <button onclick="setManualIP()">Set Server IP</button>
+            <hr style="margin: 15px 0;">
             <label for="login-username">Username</label>
             <input type="text" id="login-username" placeholder="Enter your username">
             <label for="login-password">Password</label>

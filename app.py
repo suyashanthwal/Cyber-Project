@@ -8,7 +8,6 @@ import mysql.connector
 import datetime
 import socket
 import threading
-#<----------------------------------barmola------------------------------------>
 app = Flask(__name__)
 CORS(app)
 
@@ -72,43 +71,6 @@ def start_discovery_server():
             sock.sendto(b"RECEIVER_AVAILABLE", addr)
 
 threading.Thread(target=start_discovery_server, daemon=True).start()
-#<------------------------------barmola------------------------------------->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#<---------------------------------suyash------------------------------------>
 @app.route('/register', methods=['POST'])
 def register():
     try:
@@ -152,39 +114,6 @@ def login():
     except mysql.connector.Error as err:
         print(f"Database error: {err}")
         return jsonify({"success": False, "message": "Database error"}), 500
-#<---------------------------------suyash------------------------------------>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#<---------------------------------barmola------------------------------------>
 @app.route('/upload', methods=['POST'])
 def upload_file():
     if 'file' not in request.files:
@@ -223,25 +152,21 @@ def download_file(filename):
 
 def get_local_ip():
     try:
-        # Create a socket to get the local IP
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        # Doesn't need to be reachable
         s.connect(('8.8.8.8', 80))
         ip = s.getsockname()[0]
         s.close()
         return ip
     except Exception:
-        return '127.0.0.1'  # Fallback to localhost
+        return '127.0.0.1'
 
 @app.route('/get-server-info', methods=['GET'])
 def get_server_info():
     return jsonify({
         "success": True,
         "ip": get_local_ip(),
-        "port": 5000  # Your server port
+        "port": 5000  
     })
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
-
-#<---------------------------------barmola------------------------------------>
+    app.run(debug=True, host='0.0.0.0', port=5000, threaded=True)
